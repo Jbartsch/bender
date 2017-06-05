@@ -125,7 +125,7 @@ controller.hears(
     [
         'rules',
         'what are the rules'
-    ], 'direct_message,direct_mention,mention', function(bot, message) {
+    ], 'direct_message,direct_mention,mention, ambient', function(bot, message) {
 
     bot.api.reactions.add({
         timestamp: message.ts,
