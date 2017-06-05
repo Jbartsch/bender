@@ -139,9 +139,34 @@ controller.hears(
 
 
     controller.storage.users.get(message.user, function(err, user) {
-        bot.reply(message, '```I\'ll have some rules soon...```:100:');
+        bot.reply(message, 'https://brunocapuano.files.wordpress.com/2016/10/works-in-my-machine.gif');
     });
 });
+
+controller.hears(
+    [
+        'it works',
+        'it works on my machine',
+        'it works on my computer',
+        'but on my machine it works'
+    ], 'direct_message,direct_mention,mention, ambient', function(bot, message) {
+
+        bot.api.reactions.add({
+            timestamp: message.ts,
+            channel: message.channel,
+            name: 'neckbeard',
+        }, function(err, res) {
+            if (err) {
+                bot.botkit.log('Failed to add emoji reaction :(', err);
+            }
+        });
+
+
+        controller.storage.users.get(message.user, function(err, user) {
+            bot.reply(message, '```1. If you need help, notify in #dev and move on to something else, help is on the way \n' +
+                '2. Do not get nominated for the "It works on my machine award"```:100:');
+        });
+    });
 
 controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
     var name = message.match[1];
