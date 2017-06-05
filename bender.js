@@ -1,67 +1,67 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-           ______     ______     ______   __  __     __     ______
-          /\  == \   /\  __ \   /\__  _\ /\ \/ /    /\ \   /\__  _\
-          \ \  __<   \ \ \/\ \  \/_/\ \/ \ \  _"-.  \ \ \  \/_/\ \/
-           \ \_____\  \ \_____\    \ \_\  \ \_\ \_\  \ \_\    \ \_\
-            \/_____/   \/_____/     \/_/   \/_/\/_/   \/_/     \/_/
+ ______     ______     ______   __  __     __     ______
+ /\  == \   /\  __ \   /\__  _\ /\ \/ /    /\ \   /\__  _\
+ \ \  __<   \ \ \/\ \  \/_/\ \/ \ \  _"-.  \ \ \  \/_/\ \/
+ \ \_____\  \ \_____\    \ \_\  \ \_\ \_\  \ \_\    \ \_\
+ \/_____/   \/_____/     \/_/   \/_/\/_/   \/_/     \/_/
 
 
-This is a sample Slack bot built with Botkit.
+ This is a sample Slack bot built with Botkit.
 
-This bot demonstrates many of the core features of Botkit:
+ This bot demonstrates many of the core features of Botkit:
 
-* Connect to Slack using the real time API
-* Receive messages based on "spoken" patterns
-* Reply to messages
-* Use the conversation system to ask questions
-* Use the built in storage system to store and retrieve information
-  for a user.
+ * Connect to Slack using the real time API
+ * Receive messages based on "spoken" patterns
+ * Reply to messages
+ * Use the conversation system to ask questions
+ * Use the built in storage system to store and retrieve information
+ for a user.
 
-# RUN THE BOT:
+ # RUN THE BOT:
 
-  Get a Bot token from Slack:
+ Get a Bot token from Slack:
 
-    -> http://my.slack.com/services/new/bot
+ -> http://my.slack.com/services/new/bot
 
-  Run your bot from the command line:
+ Run your bot from the command line:
 
-    token=<MY TOKEN> node slack_bot.js
+ token=<MY TOKEN> node slack_bot.js
 
-# USE THE BOT:
+ # USE THE BOT:
 
-  Find your bot inside Slack to send it a direct message.
+ Find your bot inside Slack to send it a direct message.
 
-  Say: "Hello"
+ Say: "Hello"
 
-  The bot will reply "Hello!"
+ The bot will reply "Hello!"
 
-  Say: "who are you?"
+ Say: "who are you?"
 
-  The bot will tell you its name, where it is running, and for how long.
+ The bot will tell you its name, where it is running, and for how long.
 
-  Say: "Call me <nickname>"
+ Say: "Call me <nickname>"
 
-  Tell the bot your nickname. Now you are friends.
+ Tell the bot your nickname. Now you are friends.
 
-  Say: "who am I?"
+ Say: "who am I?"
 
-  The bot will tell you your nickname, if it knows one for you.
+ The bot will tell you your nickname, if it knows one for you.
 
-  Say: "shutdown"
+ Say: "shutdown"
 
-  The bot will ask if you are sure, and then shut itself down.
+ The bot will ask if you are sure, and then shut itself down.
 
-  Make sure to invite your bot into other channels using /invite @<my bot>!
+ Make sure to invite your bot into other channels using /invite @<my bot>!
 
-# EXTEND THE BOT:
+ # EXTEND THE BOT:
 
-  Botkit has many features for building cool and useful bots!
+ Botkit has many features for building cool and useful bots!
 
-  Read all about it here:
+ Read all about it here:
 
-    -> http://howdy.ai/botkit
+ -> http://howdy.ai/botkit
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 if (!process.env.token) {
@@ -81,20 +81,20 @@ var bot = controller.spawn({
 }).startRTM();
 
 
-controller.hears(['hello', 'hi'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['hello', 'hi'], 'direct_message,direct_mention,mention', function (bot, message) {
 
     bot.api.reactions.add({
         timestamp: message.ts,
         channel: message.channel,
         name: 'robot_face',
-    }, function(err, res) {
+    }, function (err, res) {
         if (err) {
             bot.botkit.log('Failed to add emoji reaction :(', err);
         }
     });
 
 
-    controller.storage.users.get(message.user, function(err, user) {
+    controller.storage.users.get(message.user, function (err, user) {
         if (user && user.name) {
             bot.reply(message, 'Hello friend' + user.name + '!!');
         } else {
@@ -103,20 +103,20 @@ controller.hears(['hello', 'hi'], 'direct_message,direct_mention,mention', funct
     });
 });
 
-controller.hears(['goals', 'what are your goals'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['goals', 'what are your goals'], 'direct_message,direct_mention,mention', function (bot, message) {
 
     bot.api.reactions.add({
         timestamp: message.ts,
         channel: message.channel,
         name: 'rocket',
-    }, function(err, res) {
+    }, function (err, res) {
         if (err) {
             bot.botkit.log('Failed to add emoji reaction :(', err);
         }
     });
 
 
-    controller.storage.users.get(message.user, function(err, user) {
+    controller.storage.users.get(message.user, function (err, user) {
         bot.reply(message, '```1. KILL ALL HUMANS \n2. DRINK MORE BEER```:hocho:');
     });
 });
@@ -125,23 +125,23 @@ controller.hears(
     [
         'rules',
         'what are the rules'
-    ], 'direct_message,direct_mention,mention, ambient', function(bot, message) {
+    ], 'direct_message,direct_mention,mention, ambient', function (bot, message) {
 
-    bot.api.reactions.add({
-        timestamp: message.ts,
-        channel: message.channel,
-        name: 'rocket',
-    }, function(err, res) {
-        if (err) {
-            bot.botkit.log('Failed to add emoji reaction :(', err);
-        }
+        bot.api.reactions.add({
+            timestamp: message.ts,
+            channel: message.channel,
+            name: 'rocket',
+        }, function (err, res) {
+            if (err) {
+                bot.botkit.log('Failed to add emoji reaction :(', err);
+            }
+        });
+
+        controller.storage.users.get(message.user, function (err, user) {
+            bot.reply(message, '```1. If you need help, notify in #dev and move on to something else, help is on the way \n' +
+                '2. Do not get nominated for the "It works on my machine award"```:100:');
+        });
     });
-
-
-    controller.storage.users.get(message.user, function(err, user) {
-        bot.reply(message, 'https://brunocapuano.files.wordpress.com/2016/10/works-in-my-machine.gif');
-    });
-});
 
 controller.hears(
     [
@@ -149,54 +149,51 @@ controller.hears(
         'it works on my machine',
         'it works on my computer',
         'but on my machine it works'
-    ], 'direct_message,direct_mention,mention, ambient', function(bot, message) {
+    ], 'direct_message,direct_mention,mention, ambient', function (bot, message) {
 
         bot.api.reactions.add({
             timestamp: message.ts,
             channel: message.channel,
             name: 'neckbeard',
-        }, function(err, res) {
+        }, function (err, res) {
             if (err) {
                 bot.botkit.log('Failed to add emoji reaction :(', err);
             }
         });
-
-
-        controller.storage.users.get(message.user, function(err, user) {
-            bot.reply(message, '```1. If you need help, notify in #dev and move on to something else, help is on the way \n' +
-                '2. Do not get nominated for the "It works on my machine award"```:100:');
+        controller.storage.users.get(message.user, function (err, user) {
+            bot.reply(message, 'https://cdn.meme.am/cache/instances/folder68/53157068.jpg');
         });
     });
 
-controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message,direct_mention,mention', function (bot, message) {
     var name = message.match[1];
-    controller.storage.users.get(message.user, function(err, user) {
+    controller.storage.users.get(message.user, function (err, user) {
         if (!user) {
             user = {
                 id: message.user,
             };
         }
         user.name = name;
-        controller.storage.users.save(user, function(err, id) {
+        controller.storage.users.save(user, function (err, id) {
             bot.reply(message, 'Got it. I will call you ' + user.name + ' from now on.');
         });
     });
 });
 
-controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention,mention', function (bot, message) {
 
-    controller.storage.users.get(message.user, function(err, user) {
+    controller.storage.users.get(message.user, function (err, user) {
         if (user && user.name) {
             bot.reply(message, 'Your name is ' + user.name);
         } else {
-            bot.startConversation(message, function(err, convo) {
+            bot.startConversation(message, function (err, convo) {
                 if (!err) {
                     convo.say('I do not know your name yet!');
-                    convo.ask('What should I call you?', function(response, convo) {
+                    convo.ask('What should I call you?', function (response, convo) {
                         convo.ask('You want me to call you `' + response.text + '`?', [
                             {
                                 pattern: 'yes',
-                                callback: function(response, convo) {
+                                callback: function (response, convo) {
                                     // since no further messages are queued after this,
                                     // the conversation will end naturally with status == 'completed'
                                     convo.next();
@@ -204,14 +201,14 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
                             },
                             {
                                 pattern: 'no',
-                                callback: function(response, convo) {
+                                callback: function (response, convo) {
                                     // stop the conversation. this will cause it to end with status == 'stopped'
                                     convo.stop();
                                 }
                             },
                             {
                                 default: true,
-                                callback: function(response, convo) {
+                                callback: function (response, convo) {
                                     convo.repeat();
                                     convo.next();
                                 }
@@ -222,22 +219,21 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
 
                     }, {'key': 'nickname'}); // store the results in a field called nickname
 
-                    convo.on('end', function(convo) {
+                    convo.on('end', function (convo) {
                         if (convo.status == 'completed') {
                             bot.reply(message, 'OK! I will update my dossier...');
 
-                            controller.storage.users.get(message.user, function(err, user) {
+                            controller.storage.users.get(message.user, function (err, user) {
                                 if (!user) {
                                     user = {
                                         id: message.user,
                                     };
                                 }
                                 user.name = convo.extractResponse('nickname');
-                                controller.storage.users.save(user, function(err, id) {
+                                controller.storage.users.save(user, function (err, id) {
                                     bot.reply(message, 'Got it. I will call you ' + user.name + ' from now on.');
                                 });
                             });
-
 
 
                         } else {
@@ -252,43 +248,43 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
 });
 
 
-controller.hears(['shutdown'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['shutdown'], 'direct_message,direct_mention,mention', function (bot, message) {
 
-    bot.startConversation(message, function(err, convo) {
+    bot.startConversation(message, function (err, convo) {
 
         convo.ask('Are you sure you want me to shutdown?', [
             {
                 pattern: bot.utterances.yes,
-                callback: function(response, convo) {
+                callback: function (response, convo) {
                     convo.say('Bye!');
                     convo.next();
-                    setTimeout(function() {
+                    setTimeout(function () {
                         process.exit();
                     }, 3000);
                 }
             },
-        {
-            pattern: bot.utterances.no,
-            default: true,
-            callback: function(response, convo) {
-                convo.say('*Phew!*');
-                convo.next();
+            {
+                pattern: bot.utterances.no,
+                default: true,
+                callback: function (response, convo) {
+                    convo.say('*Phew!*');
+                    convo.next();
+                }
             }
-        }
         ]);
     });
 });
 
 
 controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'],
-    'direct_message,direct_mention,mention', function(bot, message) {
+    'direct_message,direct_mention,mention', function (bot, message) {
 
         var hostname = os.hostname();
         var uptime = formatUptime(process.uptime());
 
         bot.reply(message,
             ':robot_face: I am a bot named <@' + bot.identity.name +
-             '>. I have been running for ' + uptime + ' on ' + hostname + '.');
+            '>. I have been running for ' + uptime + ' on ' + hostname + '.');
 
     });
 
