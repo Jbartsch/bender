@@ -62,8 +62,6 @@
  -> http://howdy.ai/botkit
 
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-var rg = require('random-greetings')
-
 
 if (!process.env.token) {
     console.log('Error: Specify token in environment');
@@ -72,9 +70,10 @@ if (!process.env.token) {
 
 var Botkit = require('./node_modules/botkit/lib/Botkit.js');
 var os = require('os');
+var rg = require('random-greetings');
 
 var controller = Botkit.slackbot({
-    debug: true
+    debug: false
 });
 
 var bot = controller.spawn({
@@ -105,7 +104,6 @@ controller.hears(['hello', 'hi'], 'direct_message,direct_mention,mention', funct
 });
 
 controller.hears(['goals', 'what are your goals'], 'direct_message,direct_mention,mention', function (bot, message) {
-
     bot.api.reactions.add({
         timestamp: message.ts,
         channel: message.channel,
@@ -141,49 +139,37 @@ controller.hears(['morning', 'good morning'], 'direct_message,direct_mention,men
     });
 });
 
-controller.hears(
-    [
-        'rules',
-        'what are the rules'
-    ], 'direct_message,direct_mention,mention,ambient', function (bot, message) {
-
-        bot.api.reactions.add({
-            timestamp: message.ts,
-            channel: message.channel,
-            name: 'rocket',
-        }, function (err, res) {
-            if (err) {
-                bot.botkit.log('Failed to add emoji reaction :(', err);
-            }
-        });
-
-        controller.storage.users.get(message.user, function (err, user) {
-            bot.reply(message, '```1. If you need help, notify in #dev and move on to something else, help is on the way \n' +
-                '2. Do not get nominated for the "It works on my machine award"```:100:');
-        });
+controller.hears(['rules', 'what are the rules'], 'direct_message,direct_mention,mention,ambient', function (bot, message) {
+    bot.api.reactions.add({
+        timestamp: message.ts,
+        channel: message.channel,
+        name: 'rocket',
+    }, function (err, res) {
+        if (err) {
+            bot.botkit.log('Failed to add emoji reaction :(', err);
+        }
     });
-
-controller.hears(
-    [
-        'it works',
-        'it works on my machine',
-        'it works on my computer',
-        'but on my machine it works'
-    ], 'direct_message,direct_mention,mention,ambient', function (bot, message) {
-
-        bot.api.reactions.add({
-            timestamp: message.ts,
-            channel: message.channel,
-            name: 'neckbeard',
-        }, function (err, res) {
-            if (err) {
-                bot.botkit.log('Failed to add emoji reaction :(', err);
-            }
-        });
-        controller.storage.users.get(message.user, function (err, user) {
-            bot.reply(message, 'https://cdn.meme.am/cache/instances/folder68/53157068.jpg');
-        });
+    controller.storage.users.get(message.user, function (err, user) {
+        bot.reply(message, '```1. If you need help, notify in #dev and move on to something else, help is on the way \n' +
+            '2. Do not get nominated for the "It works on my machine award"```:100:');
     });
+});
+
+controller.hears(['it works', 'it works on my machine', 'it works on my computer', 'but on my machine it works'], 'direct_message,direct_mention,mention,ambient', function (bot, message) {
+
+    bot.api.reactions.add({
+        timestamp: message.ts,
+        channel: message.channel,
+        name: 'neckbeard',
+    }, function (err, res) {
+        if (err) {
+            bot.botkit.log('Failed to add emoji reaction :(', err);
+        }
+    });
+    controller.storage.users.get(message.user, function (err, user) {
+        bot.reply(message, 'https://cdn.meme.am/cache/instances/folder68/53157068.jpg');
+    });
+});
 
 controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message,direct_mention,mention', function (bot, message) {
     var name = message.match[1];
@@ -267,7 +253,6 @@ controller.hears(['what is my name', 'who am i'], 'direct_message,direct_mention
     });
 });
 
-
 controller.hears(['shutdown'], 'direct_message,direct_mention,mention', function (bot, message) {
 
     bot.startConversation(message, function (err, convo) {
@@ -295,18 +280,44 @@ controller.hears(['shutdown'], 'direct_message,direct_mention,mention', function
     });
 });
 
+controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'], 'direct_message,direct_mention,mention', function (bot, message) {
 
-controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'],
-    'direct_message,direct_mention,mention', function (bot, message) {
+    var hostname = os.hostname();
+    var uptime = formatUptime(process.uptime());
 
-        var hostname = os.hostname();
-        var uptime = formatUptime(process.uptime());
+    bot.reply(message,
+        ':robot_face: I am a bot named <@' + bot.identity.name +
+        '>. I have been running for ' + uptime + ' on ' + hostname + '.');
 
-        bot.reply(message,
-            ':robot_face: I am a bot named <@' + bot.identity.name +
-            '>. I have been running for ' + uptime + ' on ' + hostname + '.');
+});
 
+controller.hears(['help', 'what can you do'], ['ambient', 'direct_message'], function (bot, message) {
+    bot.reply(message, 'blarg');
+});
+controller.hears([/[A-Z][A-Z0-9]+-[0-9]+/g], ['direct_message'], function (bot, message) {
+    console.log(message);
+    console.log(message.match.length);
+
+    for(var i = 0; i < message.match.length; i += 1) {
+        bot.reply(message, `Match found: \`${message.match[i]}\``);
+    }
+});
+controller.hears(['userStory'], ['ambient', 'direct_message'], function (bot, message) {
+    bot.startConversation(message, aksUser);
+});
+aksUser = function (response, convo) {
+    convo.ask("What userrole is the story for?", function (response, convo) {
+        convo.say("So it\'s for `" + response.text + "` Awesome.");
+        askWant(response, convo);
+        convo.next();
     });
+}
+askWant = function (response, convo) {
+    convo.ask("What does `" + response.text + "` want to achieve?", function (response, convo) {
+        convo.say("Ok got that but I don\'t care about your story. So go ahead and add it to jira yourself");
+        convo.next();
+    });
+}
 
 function formatUptime(uptime) {
     var unit = 'second';
