@@ -121,6 +121,28 @@ controller.hears(['goals', 'what are your goals'], 'direct_message,direct_mentio
     });
 });
 
+controller.hears(
+    [
+        'rules',
+        'what are the rules'
+    ], 'direct_message,direct_mention,mention', function(bot, message) {
+
+    bot.api.reactions.add({
+        timestamp: message.ts,
+        channel: message.channel,
+        name: 'rocket',
+    }, function(err, res) {
+        if (err) {
+            bot.botkit.log('Failed to add emoji reaction :(', err);
+        }
+    });
+
+
+    controller.storage.users.get(message.user, function(err, user) {
+        bot.reply(message, '```I\'ll have some rules soon...```:100:');
+    });
+});
+
 controller.hears(['call me (.*)', 'my name is (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
     var name = message.match[1];
     controller.storage.users.get(message.user, function(err, user) {
