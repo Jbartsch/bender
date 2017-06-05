@@ -62,6 +62,7 @@
  -> http://howdy.ai/botkit
 
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+var rg = require('random-greetings')
 
 
 if (!process.env.token) {
@@ -121,11 +122,30 @@ controller.hears(['goals', 'what are your goals'], 'direct_message,direct_mentio
     });
 });
 
+controller.hears(['morning', 'good morning'], 'direct_message,direct_mention,mention,ambient', function (bot, message) {
+
+    bot.api.reactions.add({
+        timestamp: message.ts,
+        channel: message.channel,
+        name: 'rocket',
+    }, function (err, res) {
+        if (err) {
+            bot.botkit.log('Failed to add emoji reaction :(', err);
+        }
+    });
+
+
+    controller.storage.users.get(message.user, function (err, user) {
+        var greeting = rg.greet();
+        bot.reply(message, greeting);
+    });
+});
+
 controller.hears(
     [
         'rules',
         'what are the rules'
-    ], 'direct_message,direct_mention,mention, ambient', function (bot, message) {
+    ], 'direct_message,direct_mention,mention,ambient', function (bot, message) {
 
         bot.api.reactions.add({
             timestamp: message.ts,
@@ -149,7 +169,7 @@ controller.hears(
         'it works on my machine',
         'it works on my computer',
         'but on my machine it works'
-    ], 'direct_message,direct_mention,mention, ambient', function (bot, message) {
+    ], 'direct_message,direct_mention,mention,ambient', function (bot, message) {
 
         bot.api.reactions.add({
             timestamp: message.ts,
